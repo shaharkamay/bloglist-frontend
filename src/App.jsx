@@ -1,54 +1,63 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
-import BlogForm from './components/BlogForm';
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
-import loginService from './services/login';
-import { Notyf } from 'notyf';
+import loginService from './services/login'
+import { Notyf } from 'notyf'
+import Togglable from './components/Togglabe'
 
 const notyf = new Notyf({
   duration: 4000,
-  position: { x: "right", y: "top" },
+  position: { x: 'right', y: 'top' },
   types: [
     {
-      type: "error",
-      background: "indianred",
+      type: 'error',
+      background: 'indianred',
       dismissible: true,
     },
     {
-      type: "success",
-      background: "green",
-      dismissible: "true",
+      type: 'success',
+      background: 'green',
+      dismissible: 'true',
     },
   ],
-});
+})
 
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null);
+  const [blogs, setBlogs] = useState([])
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
 
 
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try {
-      const user = await loginService.login({ username, password });
-      setUser(user);
-      setUsername('');
-      setPassword('');
-      localStorage.setItem('user', JSON.stringify(user));
-      notyf.success("Logged in successfully");
+      const user = await loginService.login({ username, password })
+      setUser(user)
+      setUsername('')
+      setPassword('')
+      localStorage.setItem('user', JSON.stringify(user))
+      notyf.success('Logged in successfully')
     } catch (exception) {
-      notyf.error('Wrong credentials');
+      notyf.error('Wrong credentials')
     }
   }
-
+  const handleDeleteBlog = async (blogId) => {
+    try {
+      await blogService.deleteBlog(blogId)
+      notyf.success('Deleted blog successfully')
+      setBlogs(blogs => [...blogs.filter(blog => blog.id !== blogId)])
+    } catch (error) {
+      notyf.error(error.message)
+    }
+  }
   const logout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-    notyf.success("Logged out successfully");
+    localStorage.removeItem('user')
+    setUser(null)
+    notyf.success('Logged out successfully')
   }
 
   useEffect(() => {
@@ -59,44 +68,46 @@ const App = () => {
 
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
+    const user = localStorage.getItem('user')
     if (user) {
-      setUser(JSON.parse(user));
+      setUser(JSON.parse(user))
     }
   }, [])
 
   const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
+    <Togglable buttonLabel="Log in">
+      <form onSubmit={handleLogin}>
+        <div>
+          username
+          <input
+            type="text"
+            value={username}
+            name="Username"
+            onChange={({ target }) => setUsername(target.value)}
+          />
+        </div>
+        <div>
+          password
+          <input
+            type="password"
+            value={password}
+            name="Password"
+            onChange={({ target }) => setPassword(target.value)}
+          />
+        </div>
+        <button type="submit">login</button>
+      </form>
+    </Togglable>
   )
 
   const renderBlogs = () => (
     <div>
       <h2>blogs</h2>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+      {blogs.sort((a, b) => (b.likes - a.likes)).map(blog =>
+        <Blog key={blog.id} blog={blog} notyf={notyf} handleDeleteBlog={handleDeleteBlog} user={user} />
       )}
     </div>
-  );
+  )
 
   return (
     <div>
@@ -107,7 +118,7 @@ const App = () => {
       {user !== null && (
         <div>
           {renderBlogs()}
-          {<BlogForm blogs={blogs} setBlogs={setBlogs} notyf={notyf} />}
+          <Togglable buttonLabel="Create new blog"><BlogForm blogs={blogs} setBlogs={setBlogs} notyf={notyf} /></Togglable>
         </div>
       )}
 

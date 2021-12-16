@@ -2,25 +2,25 @@ import React, { useRef } from 'react'
 import blogService from '../services/blogs'
 
 
-function BlogForm({ blogs, setBlogs, notyf }) {
+function BlogForm({ setBlogs, notyf }) {
 
-  const titleInput = useRef();
-  const authorInput = useRef();
-  const urlInput = useRef();
+  const titleInput = useRef()
+  const authorInput = useRef()
+  const urlInput = useRef()
 
   const handleAddBlog = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     try {
       const addedBlog = await blogService.postBlog({
         title: titleInput.current.value,
         author: authorInput.current.value,
         url: urlInput.current.value
-      });
-      setBlogs(blogs => [...blogs, addedBlog]);
-      notyf.success("Added blog successfully");
+      })
+      setBlogs(blogs => [...blogs, addedBlog])
+      notyf.success('Added blog successfully')
     } catch (exception) {
-      notyf.error('Wrong blog inputs');
+      notyf.error('Wrong blog inputs')
     }
   }
 
