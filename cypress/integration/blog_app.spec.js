@@ -94,4 +94,38 @@ describe('Blog app', () => {
     })
   })
 
+  describe('When logged in and added 3 blogs and liked each differently', () => {
+    beforeEach(function () {
+      cy.contains('button', 'Log in').click()
+      cy.get('#username').type('mluukkai')
+      cy.get('#password').type('salainen')
+      cy.contains('#login-button', 'login').click()
+
+      cy.contains('button', 'Create new blog').click()
+      for (let i = 1; i <= 3; i++) {
+        cy.get('#title').type('title test' + i)
+        cy.get('#author').type('author test' + i)
+        cy.get('#url').type('url test' + i)
+        cy.get('#add-blog-btn').click()
+
+        cy.get(`.blog${i - 1}`).contains('Show more').click()
+        for (let j = 0; j < i; j++) {
+          cy.get(`.blog${i - 1}`).contains('button', 'Like').click()
+        }
+      }
+    })
+
+    it('Blogs are ordered desc according to likes', function () {
+      cy.reload()
+
+      for (let i = 1; i <= 3; i++) {
+        cy.get(`.blog${i - 1}`).contains('Show more').click()
+      }
+
+      cy.get('.blogs-div').first().get('.blog-likes').contains('3')
+      cy.get('.blogs-div').last().get('.blog-likes').contains('1')
+
+    })
+  })
+
 })

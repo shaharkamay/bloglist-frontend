@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Togglable from './Togglabe'
 
-const Blog = ({ blog, handleDeleteBlog, user, handleLike }) => {
+const Blog = ({ blog, handleDeleteBlog, user, handleLike, index }) => {
 
   const [likes, setLikes] = useState(blog.likes)
 
@@ -10,7 +10,7 @@ const Blog = ({ blog, handleDeleteBlog, user, handleLike }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className={`blog${index}`}>
       <div className="basic-details">
         {blog.title} {blog.author}
       </div>
