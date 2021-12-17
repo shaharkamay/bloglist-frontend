@@ -7,7 +7,7 @@ import { Notyf } from 'notyf'
 import Togglable from './components/Togglabe'
 
 const notyf = new Notyf({
-  duration: 4000,
+  duration: 5000,
   position: { x: 'right', y: 'top' },
   types: [
     {
@@ -31,6 +31,8 @@ const App = () => {
   const [user, setUser] = useState(null)
 
 
+
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -45,13 +47,32 @@ const App = () => {
       notyf.error('Wrong credentials')
     }
   }
+  const handleLike = async (blogId, setLikes) => {
+    const updatedBlog = await blogService.incrementLikes(blogId, user.token)
+    setLikes(updatedBlog.likes)
+    notyf.success('Liked successfully!')
+  }
   const handleDeleteBlog = async (blogId) => {
     try {
-      await blogService.deleteBlog(blogId)
+      await blogService.deleteBlog(blogId, user.token)
       notyf.success('Deleted blog successfully')
       setBlogs(blogs => [...blogs.filter(blog => blog.id !== blogId)])
     } catch (error) {
       notyf.error(error.message)
+    }
+  }
+  const handleAddBlog = async ({ title, author, url }) => {
+
+    try {
+      const addedBlog = await blogService.postBlog({
+        title,
+        author,
+        url
+      }, user.token)
+      setBlogs(blogs => [...blogs, addedBlog])
+      notyf.success('Added blog successfully')
+    } catch (exception) {
+      notyf.error('Wrong blog inputs')
     }
   }
   const logout = () => {
@@ -61,7 +82,7 @@ const App = () => {
   }
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
+    user && blogService.getAll(user.token).then(blogs =>
       setBlogs(blogs)
     )
   }, [user])
@@ -80,6 +101,7 @@ const App = () => {
         <div>
           username
           <input
+            id='username'
             type="text"
             value={username}
             name="Username"
@@ -89,13 +111,14 @@ const App = () => {
         <div>
           password
           <input
+            id='password'
             type="password"
             value={password}
             name="Password"
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button type="submit">login</button>
+        <button id='login-button' type="submit">login</button>
       </form>
     </Togglable>
   )
@@ -104,7 +127,7 @@ const App = () => {
     <div>
       <h2>blogs</h2>
       {blogs.sort((a, b) => (b.likes - a.likes)).map(blog =>
-        <Blog key={blog.id} blog={blog} notyf={notyf} handleDeleteBlog={handleDeleteBlog} user={user} />
+        <Blog key={blog.id} blog={blog} notyf={notyf} handleDeleteBlog={handleDeleteBlog} user={user} handleLike={handleLike} />
       )}
     </div>
   )
@@ -118,7 +141,7 @@ const App = () => {
       {user !== null && (
         <div>
           {renderBlogs()}
-          <Togglable buttonLabel="Create new blog"><BlogForm blogs={blogs} setBlogs={setBlogs} notyf={notyf} /></Togglable>
+          <Togglable buttonLabel="Create new blog"><BlogForm handleAddBlog={handleAddBlog} /></Togglable>
         </div>
       )}
 

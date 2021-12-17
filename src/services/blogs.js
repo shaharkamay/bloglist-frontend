@@ -1,37 +1,39 @@
 import axios from 'axios'
 const baseUrl = '/api/blogs'
 
-const getAll = async () => {
+const getAll = async (token) => {
+  console.log(token)
+
   const request = await axios.get(baseUrl, {
     headers: {
-      authorization: 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inppdi5zZXJwaG9zIiwiaWQiOiI2MWI4ZTIzNmZjZjYxYmE5NGUwOTQ3YzEiLCJpYXQiOjE2Mzk1MTU0OTB9.u-FUpI7zC9ow4d7kqQxVYVvPj5briL-xpKTe9q4Ovg4'
+      authorization: 'bearer ' + token
     }
   })
   return request.data
 }
 
-const postBlog = async (blog) => {
+const postBlog = async (blog, token) => {
   const res = await axios.post(baseUrl, blog, {
     headers: {
-      authorization: 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inppdi5zZXJwaG9zIiwiaWQiOiI2MWI4ZTIzNmZjZjYxYmE5NGUwOTQ3YzEiLCJpYXQiOjE2Mzk1MTU0OTB9.u-FUpI7zC9ow4d7kqQxVYVvPj5briL-xpKTe9q4Ovg4'
+      authorization: 'bearer ' + token
     }
   })
   return res.data
 }
 
-const incrementLikes = async (id) => {
+const incrementLikes = async (id, token) => {
   const res = await axios.put(`${baseUrl}/update`, { id }, {
     headers: {
-      authorization: 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inppdi5zZXJwaG9zIiwiaWQiOiI2MWI4ZTIzNmZjZjYxYmE5NGUwOTQ3YzEiLCJpYXQiOjE2Mzk1MTU0OTB9.u-FUpI7zC9ow4d7kqQxVYVvPj5briL-xpKTe9q4Ovg4'
+      authorization: 'bearer ' + token
     }
   })
   return res.data
 }
 
-const deleteBlog = async (id) => {
+const deleteBlog = async (id, token) => {
   await axios.delete(`${baseUrl}/${id}`, {
     headers: {
-      authorization: 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inppdi5zZXJwaG9zIiwiaWQiOiI2MWI4ZTIzNmZjZjYxYmE5NGUwOTQ3YzEiLCJpYXQiOjE2Mzk1MTU0OTB9.u-FUpI7zC9ow4d7kqQxVYVvPj5briL-xpKTe9q4Ovg4'
+      authorization: 'bearer ' + token
     }
   }, { id })
 }

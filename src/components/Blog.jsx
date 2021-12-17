@@ -1,16 +1,9 @@
 import React, { useState } from 'react'
 import Togglable from './Togglabe'
-import blogService from '../services/blogs'
 
-const Blog = ({ blog, handleDeleteBlog, notyf, user }) => {
+const Blog = ({ blog, handleDeleteBlog, user, handleLike }) => {
 
   const [likes, setLikes] = useState(blog.likes)
-
-  const incrementLikes = async (blogId) => {
-    const updatedBlog = await blogService.incrementLikes(blogId)
-    setLikes(updatedBlog.likes)
-    notyf.success('Liked successfully!')
-  }
 
   const blogStyle = {
     display: 'flex',
@@ -18,17 +11,17 @@ const Blog = ({ blog, handleDeleteBlog, notyf, user }) => {
 
   return (
     <div style={blogStyle}>
-      <div>
+      <div className="basic-details">
         {blog.title} {blog.author}
       </div>
-      <Togglable buttonLabel="Show more">
+      <Togglable className="extra-info" buttonLabel="Show more">
         <br />
-        {blog.url}
+        <span className='blog-url'>{blog.url}</span>
         <br />
-        {blog.title}
+        <span className='blog-title'>{blog.title}</span>
         <br />
-        {likes}
-        <button onClick={() => { incrementLikes(blog.id) }}>Like</button>
+        <span className='blog-likes'>{likes}</span>
+        <button id="like-btn" onClick={() => { handleLike(blog.id, setLikes) }}>Like</button>
         <br />
         {blog.user && blog.user.id === user.id
           ? <button style={{ background: 'red', color: 'white' }} onClick={() => {
@@ -37,7 +30,6 @@ const Blog = ({ blog, handleDeleteBlog, notyf, user }) => {
             else return
           }}>Delete</button>
           : ''}
-
       </Togglable>
     </div>
   )
